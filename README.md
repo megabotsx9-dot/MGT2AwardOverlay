@@ -84,13 +84,13 @@ Based on current season releases:
 ## ⚙️ Requirements
 
 - Mad Games Tycoon 2
-- BepInEx 5.x
-
+- BepInEx 5.x(x86)
+https://github.com/bepinex/bepinex/releases
 ---
 
 ## 📥 Installation
 
-1. Install BepInEx
+1. Install BepInEx(x86)
 2. Place the `.dll` file into:
 
 
@@ -119,7 +119,7 @@ Mad Games Tycoon 2/
 
 ## 🇯🇵 日本語説明
 
-このMODは Mad Games Tycoon 2 用の非公式BepInExプラグインです。  
+このMODは Mad Games Tycoon 2 用の非公式BepInEx(x86)プラグインです。  
 ゲーム内にオーバーレイを表示し、開発中ゲームの評価予測や受賞候補を確認できます。
 
 ---
