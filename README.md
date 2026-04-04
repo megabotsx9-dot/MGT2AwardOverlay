@@ -1,5 +1,5 @@
-#![20260404172242_1](https://github.com/user-attachments/assets/3dc962f0-2eb1-45e6-b949-a5295b0a1880)
- MGT2 Awards & Dev Prediction Overlay
+![20260404172242_1](https://github.com/user-attachments/assets/3dc962f0-2eb1-45e6-b949-a5295b0a1880)
+ #MGT2 Awards & Dev Prediction Overlay
 
 An unofficial BepInEx plugin for **Mad Games Tycoon 2**.  
 This mod provides an in-game overlay for development prediction and award analysis.
