@@ -1,3 +1,5 @@
+//ver3
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -59,6 +61,77 @@ namespace MGT2AwardOverlay
         private readonly List<AwardGameRow> _gotyRows = new List<AwardGameRow>();
         private readonly List<AwardGameRow> _worstRows = new List<AwardGameRow>();
         private readonly List<AwardGameRow> _selfRows = new List<AwardGameRow>();
+
+
+        private string GetCompanyNameById(int companyId)
+        {
+            if (_mainScript == null || companyId <= 0)
+                return "?";
+
+            string myName = GetString(_mainScript, "myName");
+            if (!string.IsNullOrEmpty(myName) && companyId == GetInt(_mainScript, "myID"))
+                return myName;
+
+            object[] rooms = GetArray(_mainScript, "arrayRoomScripts");
+            if (rooms != null)
+            {
+                for (int i = 0; i < rooms.Length; i++)
+                {
+                    object room = rooms[i];
+                    if (room == null)
+                        continue;
+
+                    int roomOwner = GetInt(room, "ownerID");
+                    if (roomOwner != companyId)
+                        continue;
+
+                    string roomName = GetString(room, "firmenname");
+                    if (!string.IsNullOrEmpty(roomName))
+                        return roomName;
+
+                    roomName = GetString(room, "companyName");
+                    if (!string.IsNullOrEmpty(roomName))
+                        return roomName;
+                }
+            }
+
+            object companies = GetFieldOrPropertyValue(_mainScript, "companies_");
+            if (companies != null)
+            {
+                object[] companyArray = GetArray(companies, "arrayCompanies");
+                if (companyArray == null)
+                    companyArray = GetArray(companies, "companies");
+
+                if (companyArray != null)
+                {
+                    for (int i = 0; i < companyArray.Length; i++)
+                    {
+                        object c = companyArray[i];
+                        if (c == null)
+                            continue;
+
+                        int id = GetInt(c, "myID");
+                        if (id != companyId)
+                            continue;
+
+                        string name = GetString(c, "name");
+                        if (!string.IsNullOrEmpty(name))
+                            return name;
+
+                        name = GetString(c, "firmenname");
+                        if (!string.IsNullOrEmpty(name))
+                            return name;
+
+                        name = GetString(c, "companyName");
+                        if (!string.IsNullOrEmpty(name))
+                            return name;
+                    }
+                }
+            }
+
+            return "ID:" + companyId;
+        }
+
 
 
         private string DebugReleaseFields(object g)
@@ -313,36 +386,46 @@ namespace MGT2AwardOverlay
                 // ----------------------------
                 if (mode == "GFX")
                 {
-                    line = (i + 1) + ". " + r.Name +
-                        " | dev=" + r.DeveloperId +
-                        " | GFX " + r.ReviewGrafik + rel;
+                    line = (i + 1) + ". " + r.Name
+                        + " | owner=" + r.OwnerName + " [" + r.OwnerId + "]"
+                        + " | dev=" + r.DeveloperName + " [" + r.DeveloperId + "]"
+                        + " | pub=" + r.PublisherName + " [" + r.PublisherId + "]"
+                        + " | GFX " + r.ReviewGrafik
+                        + rel;
                 }
                 else if (mode == "SND")
                 {
-                    line = (i + 1) + ". " + r.Name +
-                        " | dev=" + r.DeveloperId +
-                        " | SND " + r.ReviewSound + rel;
+                    line = (i + 1) + ". " + r.Name
+                        + " | owner=" + r.OwnerName + " [" + r.OwnerId + "]"
+                        + " | dev=" + r.DeveloperName + " [" + r.DeveloperId + "]"
+                        + " | pub=" + r.PublisherName + " [" + r.PublisherId + "]"
+                        + " | SND " + r.ReviewSound
+                        + rel;
                 }
                 else if (mode == "LOW")
                 {
-                    line = (i + 1) + ". " + r.Name +
-                        " | dev=" + r.DeveloperId +
-                        " | TOTAL " + r.ReviewTotal + rel;
+                    line = (i + 1) + ". " + r.Name
+                        + " | owner=" + r.OwnerName + " [" + r.OwnerId + "]"
+                        + " | dev=" + r.DeveloperName + " [" + r.DeveloperId + "]"
+                        + " | pub=" + r.PublisherName + " [" + r.PublisherId + "]"
+                        + " | TOTAL " + r.ReviewTotal
+                        + rel;
                 }
                 else if (mode == "SELF")
                 {
                     // ★ここが重要（デバッグ表示）
-                    line = (i + 1) + ". " + r.Name +
-                        " | dev=" + r.DeveloperId +
-                        " | TOTAL " + r.ReviewTotal +
-                        " | rel=" + r.ReleaseYear + "/" + r.ReleaseMonth + "/" + r.ReleaseWeek +
-                        " | dbg=" + r.ReleaseDebug;
+                    line = (i + 1) + ". " + r.Name
+                        + " | dev=" + r.DeveloperId
+                        + " | TOTAL " + r.ReviewTotal
+                        + " | rel=" + r.ReleaseYear + "/" + r.ReleaseMonth + "/" + r.ReleaseWeek
+                        + " | dbg=" + r.ReleaseDebug;
                 }
                 else
                 {
-                    line = (i + 1) + ". " + r.Name +
-                        " | dev=" + r.DeveloperId +
-                        " | TOTAL " + r.ReviewTotal + rel;
+                    line = (i + 1) + ". " + r.Name
+                        + " | dev=" + r.DeveloperId
+                        + " | TOTAL " + r.ReviewTotal
+                        + rel;
                 }
 
                 // ----------------------------
@@ -378,9 +461,17 @@ namespace MGT2AwardOverlay
                 string label;
 
                 if (mode == "STUDIO")
-                    label = (i + 1) + ". company=" + r.CompanyId + " | StudioPts " + r.Score.ToString("0.0");
+                {
+                    label = (i + 1) + ". company=" + r.CompanyId +
+                            " | name=" + r.CompanyName +
+                            " | StudioPts " + r.Score.ToString("0.0");
+                }
                 else
-                    label = (i + 1) + ". company=" + r.CompanyId + " | PubPts " + r.Score.ToString("0.0");
+                {
+                    label = (i + 1) + ". company=" + r.CompanyId +
+                            " | name=" + r.CompanyName +
+                            " | PubPts " + r.Score.ToString("0.0");
+                }
 
                 if (r.IsSelf)
                     GUILayout.Label("<color=cyan>" + label + "</color>", _labelStyle);
@@ -416,6 +507,23 @@ namespace MGT2AwardOverlay
 
             if (!_compact)
             {
+
+                GUILayout.Label("skillPenalty genre/theme/total="
+                    + r.EstimatedGenrePenalty.ToString("0.0") + "/"
+                    + r.EstimatedThemePenalty.ToString("0.0") + "/"
+                    + r.EstimatedSkillPenalty.ToString("0.0"), _labelStyle);
+
+                GUILayout.Label("levels genre(main/sub)="
+                    + r.MainGenreLevel + "/" + r.SubGenreLevel
+                    + " | theme(main/sub)="
+                    + r.MainThemeLevel + "/" + r.SubThemeLevel, _labelStyle);
+
+                if (r.UnexplainedPenalty > 0.1f)
+                {
+                    GUILayout.Label("<color=yellow>未説明ロス(熟練度/相性疑い): -"
+                        + r.UnexplainedPenalty.ToString("0.0") + "</color>", _labelStyle);
+                }
+                
                 GUILayout.Label("actual gp/gfx/snd/ctrl/total="
                     + r.ActReviewGp.ToString("0") + "/"
                     + r.ActReviewGfx.ToString("0") + "/"
@@ -675,10 +783,65 @@ namespace MGT2AwardOverlay
             r.ActReviewCtrl = GetInt(g, "reviewSteuerung");
             r.ActReviewTotal = GetInt(g, "reviewTotal");
 
+            r.MainGenre = GetInt(g, "maingenre");
+            r.SubGenre = GetInt(g, "subgenre");
+            r.MainTheme = GetInt(g, "gameMainTheme");
+            r.SubTheme = GetInt(g, "gameSubTheme");
+
             PredictScores(r, g);
             Analyze(r, g);
 
             return r;
+        }
+
+        private void AnalyzeSkillPenalty(DevTaskRow r, object g)
+        {
+            r.EstimatedSkillPenalty = 0f;
+            r.EstimatedGenrePenalty = 0f;
+            r.EstimatedThemePenalty = 0f;
+
+            object genres = GetFieldOrPropertyValue(g, "genres_");
+            object themes = GetFieldOrPropertyValue(g, "themes_");
+
+            if (genres != null)
+            {
+                r.MainGenreLevel = GetIntArrayValue(genres, "genres_LEVEL", r.MainGenre, 5);
+                r.SubGenreLevel = r.SubGenre >= 0 ? GetIntArrayValue(genres, "genres_LEVEL", r.SubGenre, 5) : 5;
+
+                float mainGenrePenalty = (5f - r.MainGenreLevel) * 0.6f;
+                float subGenrePenalty = r.SubGenre >= 0 ? (5f - r.SubGenreLevel) * 0.3f : 1.5f;
+
+                if (mainGenrePenalty < 0f) mainGenrePenalty = 0f;
+                if (subGenrePenalty < 0f) subGenrePenalty = 0f;
+
+                r.EstimatedGenrePenalty = mainGenrePenalty + subGenrePenalty;
+            }
+            else
+            {
+                r.MainGenreLevel = 5;
+                r.SubGenreLevel = 5;
+            }
+
+            if (themes != null)
+            {
+                r.MainThemeLevel = GetIntArrayValue(themes, "themes_LEVEL", r.MainTheme, 5);
+                r.SubThemeLevel = r.SubTheme >= 0 ? GetIntArrayValue(themes, "themes_LEVEL", r.SubTheme, 5) : 5;
+
+                float mainThemePenalty = (5f - r.MainThemeLevel) * 0.6f;
+                float subThemePenalty = r.SubTheme >= 0 ? (5f - r.SubThemeLevel) * 0.3f : 1.5f;
+
+                if (mainThemePenalty < 0f) mainThemePenalty = 0f;
+                if (subThemePenalty < 0f) subThemePenalty = 0f;
+
+                r.EstimatedThemePenalty = mainThemePenalty + subThemePenalty;
+            }
+            else
+            {
+                r.MainThemeLevel = 5;
+                r.SubThemeLevel = 5;
+            }
+
+            r.EstimatedSkillPenalty = r.EstimatedGenrePenalty + r.EstimatedThemePenalty;
         }
 
         private void PredictScores(DevTaskRow r, object g)
@@ -798,6 +961,140 @@ namespace MGT2AwardOverlay
             r.Elements.Clear();
             r.Tips.Clear();
 
+            AnalyzeSkillPenalty(r, g);
+
+            object genres = GetFieldOrPropertyValue(g, "genres_");
+            object themes = GetFieldOrPropertyValue(g, "themes_");
+
+            bool targetOk = true;
+            bool genreComboOk = true;
+            bool mainThemeOk = true;
+            bool subThemeOk = true;
+
+            // ----------------------------
+            // 適合チェック
+            // ----------------------------
+
+            int targetGroup = GetInt(g, "zielgruppe");
+            bool hasTargetGroup = GetFieldOrPropertyValue(g, "zielgruppe") != null;
+
+            if (!hasTargetGroup)
+            {
+                targetGroup = GetInt(g, "targetGroup");
+                hasTargetGroup = GetFieldOrPropertyValue(g, "targetGroup") != null;
+            }
+
+            if (!hasTargetGroup)
+            {
+                targetGroup = GetInt(g, "gameTargetGroup");
+                hasTargetGroup = GetFieldOrPropertyValue(g, "gameTargetGroup") != null;
+            }
+
+            if (genres != null)
+            {
+                if (hasTargetGroup)
+                {
+                    object targetResult = InvokeAny(genres, "IsTargetGroup", r.MainGenre, targetGroup);
+                    if (!(targetResult is bool))
+                        targetResult = InvokeAny(genres, "IsTargetGroup", targetGroup, r.MainGenre);
+
+                    if (targetResult is bool)
+                        targetOk = (bool)targetResult;
+                }
+
+                if (r.SubGenre >= 0)
+                {
+                    object comboResult = InvokeAny(genres, "IsGenreCombination", r.MainGenre, r.SubGenre);
+                    if (comboResult is bool)
+                        genreComboOk = (bool)comboResult;
+                }
+            }
+
+            if (themes != null)
+            {
+                if (r.MainTheme >= 0)
+                {
+                    object mainThemeResult = InvokeAny(themes, "IsThemesFitWithGenre", r.MainGenre, r.MainTheme);
+                    if (!(mainThemeResult is bool))
+                        mainThemeResult = InvokeAny(themes, "IsThemesFitWithGenre", r.MainTheme, r.MainGenre);
+
+                    if (mainThemeResult is bool)
+                        mainThemeOk = (bool)mainThemeResult;
+                }
+
+                if (r.SubTheme >= 0)
+                {
+                    object subThemeResult = InvokeAny(themes, "IsThemesFitWithGenre", r.MainGenre, r.SubTheme);
+                    if (!(subThemeResult is bool))
+                        subThemeResult = InvokeAny(themes, "IsThemesFitWithGenre", r.SubTheme, r.MainGenre);
+
+                    if (subThemeResult is bool)
+                        subThemeOk = (bool)subThemeResult;
+                }
+            }
+
+            // ----------------------------
+            // 不一致だった時だけ減点表示
+            // ----------------------------
+
+            if (!targetOk)
+            {
+                r.Elements.Add(new DeltaElement("ターゲット層不一致", -3f));
+                r.Tips.Add("ジャンルに合う対象年齢を確認");
+            }
+
+            if (!genreComboOk)
+            {
+                r.Elements.Add(new DeltaElement("ジャンル組み合わせ不一致", -3f));
+                r.Tips.Add("main/sub genre の相性を確認");
+            }
+
+            if (!mainThemeOk)
+            {
+                r.Elements.Add(new DeltaElement("メインテーマ不一致", -3f));
+                r.Tips.Add("テーマとジャンルの適合を確認");
+            }
+
+            if (!subThemeOk)
+            {
+                r.Elements.Add(new DeltaElement("サブテーマ不一致", -1.5f));
+                r.Tips.Add("サブテーマの適合を確認");
+            }
+
+            // ----------------------------
+            // 熟練度
+            // ----------------------------
+
+            if (r.EstimatedGenrePenalty > 0.1f)
+            {
+                r.Elements.Add(new DeltaElement("ジャンル熟練度減点(推定)", -r.EstimatedGenrePenalty));
+                r.Tips.Add("ジャンル熟練度: main Lv" + r.MainGenreLevel + " / sub Lv" + r.SubGenreLevel);
+            }
+
+            if (r.EstimatedThemePenalty > 0.1f)
+            {
+                r.Elements.Add(new DeltaElement("テーマ熟練度減点(推定)", -r.EstimatedThemePenalty));
+                r.Tips.Add("テーマ熟練度: main Lv" + r.MainThemeLevel + " / sub Lv" + r.SubThemeLevel);
+            }
+
+            // ----------------------------
+            // 各能力不足
+            // ----------------------------
+
+            float gpDef = 80f - r.Gp;
+            if (gpDef > 0)
+            {
+                r.Elements.Add(new DeltaElement("GAMEPLAY不足", -gpDef));
+                r.Tips.Add("GAMEPLAY改善 +" + gpDef.ToString("0.0"));
+            }
+
+            float gfxDef = 80f - r.Gfx;
+            if (gfxDef > 0)
+            {
+                r.Elements.Add(new DeltaElement("GRAPHIC不足", -gfxDef));
+                r.Tips.Add("GRAPHIC改善 +" + gfxDef.ToString("0.0"));
+            }
+
             float ctrlDef = 80f - r.Ctrl;
             if (ctrlDef > 0)
             {
@@ -811,6 +1108,10 @@ namespace MGT2AwardOverlay
                 r.Elements.Add(new DeltaElement("SOUND不足", -sndDef));
                 r.Tips.Add("SOUND改善 +" + sndDef.ToString("0.0"));
             }
+
+            // ----------------------------
+            // その他の既知減点
+            // ----------------------------
 
             int gameSize = GetInt(g, "gameSize");
             if (gameSize == 0)
@@ -844,6 +1145,37 @@ namespace MGT2AwardOverlay
             if (GetInt(g, "portID") != -1)
             {
                 r.Elements.Add(new DeltaElement("移植", -3f));
+            }
+
+            // ----------------------------
+            // 未説明ロス
+            // ----------------------------
+
+            r.UnexplainedPenalty = 0f;
+
+            if (r.ActReviewTotal > 0)
+            {
+                float knownPenalty = 0f;
+
+                for (int i = 0; i < r.Elements.Count; i++)
+                {
+                    if (r.Elements[i].Value < 0f)
+                        knownPenalty += -r.Elements[i].Value;
+                }
+
+                float rawGap = r.Total - r.ActReviewTotal;
+                if (rawGap < 0f)
+                    rawGap = 0f;
+
+                r.UnexplainedPenalty = rawGap - knownPenalty;
+                if (r.UnexplainedPenalty < 0f)
+                    r.UnexplainedPenalty = 0f;
+
+                if (r.UnexplainedPenalty > 1.0f)
+                {
+                    r.Elements.Add(new DeltaElement("未説明ロス(熟練度/相性疑い)", -r.UnexplainedPenalty));
+                    r.Tips.Add("既知減点以外のロスあり");
+                }
             }
         }
 
@@ -912,6 +1244,9 @@ namespace MGT2AwardOverlay
 
                 Dictionary<int, float> studioScoreMap = new Dictionary<int, float>();
                 Dictionary<int, float> publisherScoreMap = new Dictionary<int, float>();
+                
+                Dictionary<int, string> studioNameMap = new Dictionary<int, string>();
+                Dictionary<int, string> publisherNameMap = new Dictionary<int, string>();
 
                 for (int i = 0; i < allGames.Length; i++)
                 {
@@ -952,6 +1287,19 @@ namespace MGT2AwardOverlay
 
                     int devId = row.DeveloperId;
                     int pubId = row.PublisherId;
+
+                    if (devId > 0)
+                    {
+                        if (!studioNameMap.ContainsKey(devId) && !string.IsNullOrEmpty(row.DeveloperName))
+                            studioNameMap[devId] = row.DeveloperName;
+                    }
+
+                    if (pubId > 0)
+                    {
+                        if (!publisherNameMap.ContainsKey(pubId) && !string.IsNullOrEmpty(row.PublisherName))
+                            publisherNameMap[pubId] = row.PublisherName;
+                    }
+
 
                     if (devId > 0)
                     {
@@ -1019,6 +1367,13 @@ namespace MGT2AwardOverlay
                 {
                     CompanyScoreRow r = new CompanyScoreRow();
                     r.CompanyId = kv.Key;
+
+                    string name;
+                    if (!studioNameMap.TryGetValue(kv.Key, out name))
+                        name = GetCompanyNameById(kv.Key);
+
+                    r.CompanyName = name;
+
                     r.Score = kv.Value;
                     r.IsSelf = (kv.Key == myId);
                     _studioAwardRows.Add(r);
@@ -1028,6 +1383,13 @@ namespace MGT2AwardOverlay
                 {
                     CompanyScoreRow r = new CompanyScoreRow();
                     r.CompanyId = kv.Key;
+
+                    string name;
+                    if (!publisherNameMap.TryGetValue(kv.Key, out name))
+                        name = GetCompanyNameById(kv.Key);
+
+                    r.CompanyName = name;
+
                     r.Score = kv.Value;
                     r.IsSelf = (kv.Key == myId);
                     _publisherAwardRows.Add(r);
@@ -1080,6 +1442,22 @@ namespace MGT2AwardOverlay
             r.DeveloperId = GetInt(g, "developerID");
             r.PublisherId = GetInt(g, "publisherID");
 
+
+            string ownerName = TryInvokeString(g, "GetOwnerName");
+            if (string.IsNullOrEmpty(ownerName))
+                ownerName = "ID:" + r.OwnerId;
+            r.OwnerName = ownerName;
+
+            string developerName = TryInvokeString(g, "GetDeveloperName");
+            if (string.IsNullOrEmpty(developerName))
+                developerName = "ID:" + r.DeveloperId;
+            r.DeveloperName = developerName;
+
+            string publisherName = TryInvokeString(g, "GetPublisherName");
+            if (string.IsNullOrEmpty(publisherName))
+                publisherName = "ID:" + r.PublisherId;
+            r.PublisherName = publisherName;
+
             r.ReviewGameplay = GetInt(g, "reviewGameplay");
             r.ReviewGrafik = GetInt(g, "reviewGrafik");
             r.ReviewSound = GetInt(g, "reviewSound");
@@ -1097,7 +1475,7 @@ namespace MGT2AwardOverlay
             r.ReleaseStamp = MakeDateStamp(r.ReleaseYear, r.ReleaseMonth, r.ReleaseWeek);
 
             r.ReleaseDebug = DebugReleaseFields(g);
-            
+
             return r;
         }
 
@@ -1164,7 +1542,7 @@ namespace MGT2AwardOverlay
             float v = ToFloat(GetFieldOrPropertyValue(g, "studioPoints"));
             if (Math.Abs(v) > 0.001f) return v;
 
-            v = ToFloat(GetFieldOrPropertyValue(g, "studioPoints_" ));
+            v = ToFloat(GetFieldOrPropertyValue(g, "studioPoints_"));
             if (Math.Abs(v) > 0.001f) return v;
 
             // fallback: reviewTotal を仮ポイントとして使う
@@ -1230,6 +1608,9 @@ namespace MGT2AwardOverlay
             _gotyRows.Clear();
             _worstRows.Clear();
             _selfRows.Clear();
+
+            _studioAwardRows.Clear();
+            _publisherAwardRows.Clear();
         }
 
         private static object GetFieldOrPropertyValue(object obj, string name)
@@ -1386,6 +1767,22 @@ namespace MGT2AwardOverlay
 
     internal sealed class DevTaskRow
     {
+
+        public int MainGenre;
+        public int SubGenre;
+        public int MainTheme;
+        public int SubTheme;
+
+        public int MainGenreLevel;
+        public int SubGenreLevel;
+        public int MainThemeLevel;
+        public int SubThemeLevel;
+
+        public float EstimatedSkillPenalty;
+        public float EstimatedGenrePenalty;
+        public float EstimatedThemePenalty;
+        public float UnexplainedPenalty;
+
         public string TaskKind;
         public int RoomId;
         public int RoomType;
@@ -1428,6 +1825,9 @@ namespace MGT2AwardOverlay
 
     internal sealed class AwardGameRow
     {
+        public string OwnerName;
+        public string DeveloperName;
+        public string PublisherName;
         public string ReleaseDebug;
 
         public string Name;
@@ -1465,6 +1865,7 @@ namespace MGT2AwardOverlay
     internal sealed class CompanyScoreRow
     {
         public int CompanyId;
+        public string CompanyName;
         public float Score;
         public bool IsSelf;
     }
