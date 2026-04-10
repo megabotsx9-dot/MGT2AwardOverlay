@@ -1,5 +1,6 @@
 
-![20260404172242_1](https://github.com/user-attachments/assets/1e7e6caa-d1ce-4208-a4f0-ee3d79130561)
+<img width="1497" height="821" alt="image" src="https://github.com/user-attachments/assets/99d51ad0-36b9-4d34-b89f-dcf6032da209" />
+
  #MGT2 Awards & Dev Prediction Overlay
 
 An unofficial BepInEx plugin for **Mad Games Tycoon 2**.  
