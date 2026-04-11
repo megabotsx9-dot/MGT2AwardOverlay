@@ -21,6 +21,7 @@ Reference:
 
 ⚠️ Other versions may not work correctly.
 
+💡 This mod can also run on the vanilla version of the game, but full functionality is only guaranteed when used with Realism Mod.
 ---
 
 ## 📌 Features
@@ -138,6 +139,7 @@ Mad Games Tycoon 2/
 
 ※上記以外のバージョンでは正常に動作しない可能性があります
 
+💡 一応、バニラ環境でも動作します。
 ---
 
 ### 主な機能
