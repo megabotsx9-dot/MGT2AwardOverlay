@@ -1,5 +1,17 @@
-
+<img width="1379" height="749" alt="image" src="https://github.com/user-attachments/assets/4d8b8161-7a72-48d3-8b4b-ceab6131b87c" />
 <img width="1497" height="821" alt="image" src="https://github.com/user-attachments/assets/99d51ad0-36b9-4d34-b89f-dcf6032da209" />
+---------------------
+⚠！注意！⚠
+現在このpluginは日本語版、英語版、フランス語版が公開されています。 全てのdllを同時に起動しないでください。
+
+⚠！Caution！⚠
+This plugin is currently available in Japanese, English, and French versions.
+Do not run all DLLs at the same time.
+
+⚠！Attention！⚠
+Ce plugin est actuellement disponible en versions japonaise, anglaise et française.
+N’exécutez pas tous les fichiers DLL en même temps.
+---------------------
 
  #MGT2 Awards & Dev Prediction Overlay
 
